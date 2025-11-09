@@ -1,19 +1,22 @@
 import { Request, Response } from 'express'
-import * as service from '../services/customerService'
-import { successResponse, errorResponse } from '../utils/response'
-import { parsePagination, paginatedSuccessResponse } from '../utils/pagination'
+import * as service from '@/services/customerService'
+import { successResponse, errorResponse } from '@/utils/response'
+import { parsePagination, paginatedSuccessResponse } from '@/utils/pagination'
 
 export async function createCustomer(req: Request, res: Response) {
-    const { name, email, phone } = req.body
-
     try {
-        const newCustomer = await service.createCustomer({ name, email, phone })
+        const newCustomer = await service.createCustomer(req.body)
 
         return successResponse(res, newCustomer, { status: 201, message: 'Customer created' })
     } catch (err: any) {
         if (err?.code === 'P2002') {
             return errorResponse(res, 'Customer with this email already exists', 409, err.meta)
         }
+
+        if (err?.code === 'P2012') {
+            return errorResponse(res, 'Missing required fields', 400, err.meta)
+        }
+
         console.error(err)
         return errorResponse(res)
     }
@@ -53,7 +56,6 @@ export async function updateCustomer(req: Request, res: Response) {
     const data = req.body
 
     try {
-        // pre-check existence to avoid P2025 as control flow
         const existing = await service.findCustomerById(id)
         if (!existing) return errorResponse(res, 'Customer not found', 404)
 

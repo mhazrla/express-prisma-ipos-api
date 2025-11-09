@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express'
-import { validationErrorResponse } from '../utils/response'
+import { validationErrorResponse } from '@/utils/response'
 
 export const createCustomerSchema = z.object({
   name: z.string().min(1, 'Name is required'),

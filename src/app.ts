@@ -12,6 +12,6 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use('/api/v1/', customerRouter);
+app.use('/api/v1/customers', customerRouter);
 
 export default app
