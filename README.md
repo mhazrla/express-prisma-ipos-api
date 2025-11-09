@@ -5,7 +5,7 @@
 This is a comprehensive **Inventory Management System (IMS)** with **Point of Sale (POS)** functionality, built with a robust tech stack:
 - **Backend:** Node.js + Express
 - **Language:** TypeScript
-- **Database:** MongoDB
+- **Database:** PostgreSQL
 - **ORM:** Prisma
 
 This API is designed for businesses managing multiple shop locations (e.g., a chain of drug shops), enabling Admins to manage:
