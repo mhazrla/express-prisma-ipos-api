@@ -127,6 +127,41 @@ const swaggerSpec = {
         responses: { '200': { description: 'Deleted' }, '404': { description: 'Not found' } },
       },
     },
+    '/api/v1/shops': {
+      get: {
+        summary: 'List shops (paginated)',
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer' }, description: 'Page number' },
+          { name: 'limit', in: 'query', schema: { type: 'integer' }, description: 'Page size' },
+        ],
+        responses: {
+          '200': {
+            description: 'A paginated list of shops',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/PaginatedShop' },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        summary: 'Create a shop',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ShopCreate' },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Shop created', content: { 'application/json': { schema: { $ref: '#/components/schemas/Shop' } } } },
+          '409': { description: 'Conflict - shop already exists' },
+          '422': { description: 'Validation error' },
+        },
+      },
+    },
   },
   components: {
     schemas: {
@@ -216,6 +251,29 @@ const swaggerSpec = {
         properties: { name: { type: 'string' }, email: { type: 'string' }, phone: { type: 'string' } },
       },
       PaginatedCustomer: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean' },
+          message: { type: 'string' },
+          data: { type: 'array', items: { $ref: '#/components/schemas/Customer' } },
+          meta: {
+            type: 'object',
+            properties: { total: { type: 'integer' }, page: { type: 'integer' }, limit: { type: 'integer' }, totalPages: { type: 'integer' } },
+          },
+        },
+      },
+      Shop: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' },
+          email: { type: 'string' },
+          phone: { type: 'string', nullable: true },
+          createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
+      },
+      PaginatedShop: {
         type: 'object',
         properties: {
           success: { type: 'boolean' },
