@@ -48,6 +48,7 @@ model User {
 model Shop {
   id              String      @id @default(uuid())
   name            String
+  slug            String      @unique
   location        String
   adminId         String      
   admin           User        @relation(fields: [adminId], references: [id])

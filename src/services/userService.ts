@@ -1,3 +1,4 @@
+import { UserFilters } from '@/interfaces/IUser'
 import prisma from '@/lib/prisma'
 import { User, Prisma } from '@prisma/client'
 import bcrypt from 'bcrypt'
@@ -33,8 +34,15 @@ export async function findUserById(id: string): Promise<Omit<User, 'password'> |
   return exclude(user, ['password'])
 }
 
-export async function findUsers(skip: number, take: number): Promise<Omit<User, 'password'>[]> {
+export async function findUsers(skip: number, take: number, filters: UserFilters): Promise<Omit<User, 'password'>[]> {
+  const whereClause: Prisma.UserWhereInput = {};
+
+  if (filters.role) {
+    whereClause.role = filters.role
+  }
+  
   const users = await prisma.user.findMany({
+    where: whereClause,
     skip,
     take,
     orderBy: { createdAt: 'desc' },
@@ -42,8 +50,16 @@ export async function findUsers(skip: number, take: number): Promise<Omit<User, 
   return users.map((user) => exclude(user, ['password']))
 }
 
-export async function countUsers(): Promise<number> {
-  return prisma.user.count()
+export async function countUsers(filters: UserFilters): Promise<number> {
+  const whereClause: Prisma.UserWhereInput = {};
+
+  if (filters.role) {
+    whereClause.role = filters.role;
+  }
+
+  return prisma.user.count({
+    where: whereClause,
+  })
 }
 
 export async function updateUser(id: string, data: Prisma.UserUpdateInput): Promise<Omit<User, 'password'>> {

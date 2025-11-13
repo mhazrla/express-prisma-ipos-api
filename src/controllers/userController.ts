@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import * as service from '@/services/userService';
 import { successResponse, errorResponse } from '@/utils/response'
 import { parsePagination, paginatedSuccessResponse } from '@/utils/pagination'
+import { UserFilters } from '@/interfaces/IUser';
+import { isValidRole } from '@/utils/types';
 
 export async function createUser(req: Request, res: Response) {
     try {
@@ -22,13 +24,20 @@ export async function createUser(req: Request, res: Response) {
     }
 }
 
-export async function getUser(req: Request, res: Response) {
+export async function getUsers(req: Request, res: Response) {
     const { page, limit, skip } = parsePagination(req.query)
+
+    const { role } = req.query;
+    const filters: UserFilters = {};
+    
+    if (isValidRole(role)) {
+        filters.role = role;
+    }
 
     try {
         const [items, total] = await Promise.all([
-            service.findUsers(skip, limit),
-            service.countUsers(),
+            service.findUsers(skip, limit, filters),
+            service.countUsers(filters),
         ])
 
         return paginatedSuccessResponse(req, res, items, total, page, limit, 'User retrieved')
@@ -76,7 +85,6 @@ export async function updateUser(req: Request, res: Response) {
 export async function deleteUser(req: Request, res: Response) {
     const { id } = req.params
     try {
-        // pre-check
         const existing = await service.findUserById(id)
         if (!existing) return errorResponse(res, 'User not found', 404)
 
@@ -91,4 +99,4 @@ export async function deleteUser(req: Request, res: Response) {
     }
 }
 
-export default { createUser, getUser, getUserById, updateUser, deleteUser }
+export default { createUser, getUsers, getUserById, updateUser, deleteUser }

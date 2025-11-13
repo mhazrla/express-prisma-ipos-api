@@ -17,6 +17,16 @@ const swaggerSpec = {
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer' }, description: 'Page number' },
           { name: 'limit', in: 'query', schema: { type: 'integer' }, description: 'Page size' },
+          {
+            name: 'role',
+            in: 'query',
+            required: false,
+            description: 'Filter users by role',
+            schema: {
+              type: 'string',
+              enum: ['ADMIN', 'ATTENDANT'],
+            },
+          },
         ],
         responses: {
           '200': {
