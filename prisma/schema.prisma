@@ -15,61 +15,56 @@ datasource db {
 }
 
 model Customer {
-  id          String      @id @default(uuid())
-  email       String      @unique
-  name        String
-  phone       String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-}
-
-// Example Models for a simple inventory system
-model Product {
-  id          String      @id @default(uuid())
-  name        String
-  description String?
-  price       Decimal     @db.Decimal(10,2)
-  stock       Int         @default(0)
-  categoryId  String?
-  category    Category?   @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orders      OrderItem[]
-}
-
-model Category {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model Order {
-  id        String      @id @default(uuid())
-  userId    String
-  total     Decimal     @db.Decimal(10,2)
-  status    OrderStatus @default(PENDING)
-  items     OrderItem[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-}
-
-model OrderItem {
   id        String   @id @default(uuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Decimal  @db.Decimal(10,2)
+  email     String   @unique
+  name      String
+  phone     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("customers")
 }
 
-enum OrderStatus {
-  PENDING
-  PAID
-  CANCELLED
-  DELIVERED
+model User {
+  id              String      @id @default(uuid())
+  email           String      @unique
+  username        String      @unique
+  password        String
+  firstName       String
+  lastName        String
+  phone           String      @unique
+  dob             DateTime?
+  gender          Gender
+  image           String?
+  role            Role        @default(ATTENDANT)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  ownedShops      Shop[]      // Shops where user is admin
+  worksAtShops    Shop[]      @relation("ShopAttendants")
+
+  @@map("users")
+}
+
+model Shop {
+  id              String      @id @default(uuid())
+  name            String
+  slug            String      @unique
+  location        String
+  adminId         String      
+  admin           User        @relation(fields: [adminId], references: [id])
+  attendants      User[]      @relation("ShopAttendants")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("shops")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Role {
+  ADMIN
+  ATTENDANT
 }
